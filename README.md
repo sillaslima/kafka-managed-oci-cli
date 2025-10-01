@@ -23,7 +23,20 @@ echo "OCPU_COUNT: ${OCPU_COUNT:-'NÃO DEFINIDA'}" && \
 echo "CLUSTER_CONFIG_ID: ${CLUSTER_CONFIG_ID:-'NÃO DEFINIDA'}" && \
 echo "STORAGE_SIZE: ${STORAGE_SIZE:-'NÃO DEFINIDA'}" 
 
-
+#Se não existir, criar uma configuração:
+if [ -z "$CLUSTER_CONFIG_ID" ] || [ "$CLUSTER_CONFIG_ID" = "null" ]; then
+    echo "Criando nova configuração de cluster..."
+    CLUSTER_CONFIG_ID=$(oci kafka cluster-config create \
+        --compartment-id "$COMPARTMENT_ID" \
+        --display-name "${DISPLAY_NAME}-config" \
+        --kafka-version "$KAFKA_VERSION" \
+        --cluster-type "$CLUSTER_TYPE" \
+        --coordination-type "$COORDINATION_TYPE" \
+        --query 'data.id' --raw-output)
+    echo "Configuração criada: $CLUSTER_CONFIG_ID"
+else
+    echo "Usando configuração existente: $CLUSTER_CONFIG_ID"
+fi
 
 ```
 
